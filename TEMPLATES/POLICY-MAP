@@ -1,0 +1,7 @@
+Value NAME (\S+)
+Value CLASS (\S+)
+
+Start
+  ^[P-p]olicy-map.${NAME} -> Record
+  ^.[C-c]lass.${CLASS} -> Record
+
