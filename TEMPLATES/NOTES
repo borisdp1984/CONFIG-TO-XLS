@@ -1,0 +1,14 @@
+RP/0/0/CPU0:XRv-1(config-pmap-c)#?
+  bandwidth           Configure bandwidth for this class
+  police              Police traffic
+  priority            Assign priority to this class
+  queue-limit         Configure queue-limit (taildrop threshold) for this class
+  random-detect       Enable Random Early Detection
+  service-policy      Configure a child service policy
+  set                 Configure marking for this class
+  shape               Configure shaping for this class
+
+---------------------------------------------------------------------------------------
+
+RP/0/0/CPU0:XRv-1(config-pmap-c)#priority level 1 ?
+  <cr>

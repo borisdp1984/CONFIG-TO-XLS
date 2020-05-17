@@ -1,14 +1,39 @@
-import os
-import textfsm
+import re
+import pandas as pd
+import time
+import json
 
-os.chdir(r'C:\Users\davide.panzeri\Desktop\Configs\NCS')
 
-input_file = open('EST-1.txt')
-cli_data = input_file.read()
-input_file.close()
+policycomplete = ['policy-map SET_DIGITEN', 'class DIGITEN-103', 'police cir 4000000000 4000000000', 'conform-action set qos-group 5', 'conform-action set mpls experimental imposition 5', 'exceed-action drop', 'class DIGITEN-101', 'police cir 1000000000', 'conform-action set qos-group 5', 'conform-action set mpls experimental imposition 5', 'exceed-action drop', 'class DIGITEN-115', 'police cir 600000000', 'conform-action set mpls experimental imposition 5', 'conform-action set qos-group 5', 'exceed-action drop', 'class DIGITEN-119', 'police cir 600000000', 'conform-action set qos-group 5', 'conform-action set mpls experimental imposition 5', 'exceed-action drop', 'class DIGITEN-123', 'police cir 600000000', 'conform-action set mpls experimental imposition 5', 'conform-action set qos-group 5', 'exceed-action drop', 'class DIGITEN-125', 'police cir 600000000', 'conform-action set mpls experimental imposition 5', 'conform-action set qos-group 5', 'exceed-action drop', 'class DIGITEN-121', 'police cir 600000000', 'conform-action set mpls experimental imposition 5', 'conform-action set qos-group 5', 'exceed-action drop']
 
-with open(r'C:\CONFIG-TO-XLS\TEMPLATES\POLICY-MAP') as f:
-    template = textfsm.TextFSM(f)
-    fsm_results = template.ParseText(cli_data)
+date = time.strftime("%Y-%m-%d_%H-%M-%S")
 
-print(fsm_results)
+end = {}
+splitted_lists = []
+
+for s in policycomplete:
+    if s == '':
+        continue
+    if s.startswith('policy-map') or len(splitted_lists) == 0:
+        splitted_lists.append(s.split())
+        continue
+    if s.startswith('class') or len(splitted_lists) == 0:
+        splitted_lists.append([s])
+        continue
+    splitted_lists[-1].append(s)
+
+for lists in splitted_lists:
+    keys = lists[0]
+    value = lists[1::]
+    end.update([(keys, value)])
+
+
+final = {k: val[0] if len(val) == 1 else val for k, val in end.items()}
+
+print(json.dumps(final, indent=2))
+
+
+# df = pd.DataFrame()
+# df = df.append(final, ignore_index=True)
+# df.to_excel(r'C:\Users\davide.panzeri\Desktop\Router ' + date + '.xlsx',sheet_name='POLICY-MAP', index = True )
+

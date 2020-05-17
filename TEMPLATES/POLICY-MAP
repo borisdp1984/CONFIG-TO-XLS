@@ -1,7 +1,17 @@
-Value NAME (\S+)
-Value CLASS (\S+)
+Value NAME ([P-p]olicy-map.\S+)
+Value CLASS ([C-c]lass.\S+.\S+)
+Value PRIORITY ([P-p]riority.\S+.\S+)
+Value POLICE ([P-p]olice.\S+.\S+.\S+)
+Value SHAPE ([S-s]hape.\S+.\S+.\S+.\S+)
+Value SET (set+.\S+.\S+.\S+.\S+)
+
 
 Start
-  ^[P-p]olicy-map.${NAME} -> Record
-  ^.[C-c]lass.${CLASS} -> Record
+  ^${NAME} -> Continue
+  ^.${CLASS} -> Continue
+  ^..${PRIORITY} -> Continue
+  ^..${POLICE} -> Continue
+  ^..${SHAPE} -> Continue
+  ^..${SET} -> Record
+
 
