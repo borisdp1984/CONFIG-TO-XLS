@@ -12,3 +12,12 @@ RP/0/0/CPU0:XRv-1(config-pmap-c)#?
 
 RP/0/0/CPU0:XRv-1(config-pmap-c)#priority level 1 ?
   <cr>
+
+!---------------------------------------------------------------------
+
+from itertools import count
+
+incr = count(startnum)
+end = []
+
+lst = re.sub(r'^class', lambda x: x.group(0) + '-' + str(next(incr)), st)
