@@ -20,7 +20,6 @@ policycomplete = ['policy-map SET_DIGITEN', 'class DIGITEN-103', 'police cir 400
                   'exceed-action drop']
 
 
-
 action = []
 for element in policycomplete:
     if element.startswith('class'):
@@ -28,6 +27,11 @@ for element in policycomplete:
         action.append('actions')
     else:
         action.append(element)
+
+startclass = 1
+incrclass = count(startclass)
+startcact = 1
+incrcact = count(startclass)
 
 
 
@@ -40,21 +44,14 @@ for s in action:
         splitted_lists.append(s.split())
         continue
     if s.startswith('class') or len(splitted_lists) == 0:
-        splitted_lists.append(s.split())
+        numclass = re.sub(r'^class', lambda x: x.group(0) + '-' + str(next(incrclass)), s)
+        splitted_lists.append(numclass.split())
         continue
     if s.startswith('action') or len(splitted_lists) == 0:
-        splitted_lists.append(s.split())
+        numcact = re.sub(r'^actions', lambda x: x.group(0) + '-' + str(next(incrcact)), s)
+        splitted_lists.append(numcact.split())
         continue
     splitted_lists[-1].append(s)
-
-startnum = 1
-incr = count(startnum)
-
-
-
-for lists in splitted_lists:
-    for sti in lists:
-        re.sub(r'^class', lambda x: x.group(0) + '-' + str(next(incr)), sti)
 
 end = {}
 
@@ -71,7 +68,8 @@ print()
 print(final)
 print(json.dumps(final, indent=2))
 
-#date = time.strftime("%Y-%m-%d_%H-%M-%S")
-# df = pd.DataFrame()
-# df = df.append(final, ignore_index=True)
-# df.to_excel(r'C:\Users\davide.panzeri\Desktop\Router ' + date + '.xlsx',sheet_name='POLICY-MAP', index = True )
+date = time.strftime("%Y-%m-%d_%H-%M-%S")
+df = pd.DataFrame(final, columns=end.keys())
+#df = df.append(final, ignore_index=True)
+print(df.to_string)
+df.to_excel(r'C:\Users\davide.panzeri\Desktop\Router ' + date + '.xlsx',sheet_name='POLICY-MAP', index = True )
