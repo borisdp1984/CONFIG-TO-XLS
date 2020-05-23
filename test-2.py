@@ -33,29 +33,27 @@ incrclass = count(startclass)
 startcact = 1
 incrcact = count(startclass)
 
-
-
-splitted_lists = []
+Second_Split = []
 
 for s in action:
     if s == '':
         continue
-    if s.startswith('policy-map') or len(splitted_lists) == 0:
-        splitted_lists.append(s.split())
+    if s.startswith('policy-map') or len(Second_Split) == 0:
+        Second_Split.append(s.split())
         continue
-    if s.startswith('class') or len(splitted_lists) == 0:
+    if s.startswith('class') or len(Second_Split) == 0:
         numclass = re.sub(r'^class', lambda x: x.group(0) + '-' + str(next(incrclass)), s)
-        splitted_lists.append(numclass.split())
+        Second_Split.append(numclass.split())
         continue
-    if s.startswith('action') or len(splitted_lists) == 0:
+    if s.startswith('action') or len(Second_Split) == 0:
         numcact = re.sub(r'^actions', lambda x: x.group(0) + '-' + str(next(incrcact)), s)
-        splitted_lists.append(numcact.split())
+        Second_Split.append(numcact.split())
         continue
-    splitted_lists[-1].append(s)
+    Second_Split[-1].append(s)
 
 end = {}
 
-for lists in splitted_lists:
+for lists in Second_Split:
     keys = lists[0]
     value = lists[1::]
     end.update([(keys, value)])
@@ -63,10 +61,10 @@ for lists in splitted_lists:
 final = {k: val[0] if len(val) == 1 else val for k, val in end.items()}
 
 
-print(splitted_lists)
+print(Second_Split)
 print()
 print(final)
-print(json.dumps(final, indent=2))
+print(json.dumps(final, indent=5))
 
 date = time.strftime("%Y-%m-%d_%H-%M-%S")
 df = pd.DataFrame(final, columns=end.keys())
