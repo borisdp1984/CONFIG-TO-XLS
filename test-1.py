@@ -2,18 +2,18 @@ import os
 import re
 import json
 from itertools import count
+import pandas as pd
+import time
 
 os.chdir(r'C:\Users\davide.panzeri\Desktop\Configs\NCS')
 
-filename = [line.rstrip() for line in open('EST-1.txt')]
+filename = [line.rstrip() for line in open('FERRARA-MPLS-1.txt')]
 
 filteredlines = []
 action = []
 First_Split = []
 Second_Split = []
-dct = {}
-mainlst =  []
-final = {}
+end = []
 
 for line in filename:
     if re.search(r"^policy-map \S+"
@@ -21,13 +21,18 @@ for line in filename:
                  r"|^ +[P-p]riority.\S+.\S+"
                  r"|^ +[P-p]olice.\S+.\S+.\S+"
                  r"|^ +[S-s]hape.\S+.\S+.\S+.\S+"
-                 r"|set.\S+.\S+.\S+.\S+"
+                 r"|set.(ip.(?!next-hop|local-preference)|"
+                 r"atm-clp|cos|discard-class|dscp|fr-de|mpls|precedence|qos-group|srp-priority|traffic-class).\S+"
                  r"|^ +[B-b]andwidth.\S+.\S+.\S+"
-                 r"|^ +(service-policy.(?!input|output)\S+)"
+                 r"|^ +(service-policy.(?!input|output|in|out)\S+)"
                  r"|^ +[C-c]onform-action.\S+."
+                 r"|^ +[Q-q]ueue-limit.\S+.\S+"
+                 r"|^ +[F-f]air-queue"
                  r"|^ +[E-e]xceed-action.\S+", line):
         b = re.sub("^ +", "", line)
         filteredlines.append(b)
+
+print(filteredlines)
 
 for element in filteredlines:
     if element.startswith('class'):
@@ -43,9 +48,6 @@ for s in action:
         First_Split.append([s])
         continue
     First_Split[-1].append(s)
-
-# print(First_Split)
-# print()
 
 for sublist in First_Split:
     startclass = 1
@@ -70,25 +72,20 @@ for sublist in First_Split:
         container[-1].append(s)
     Second_Split.append(container)
 
-# print(Second_Split)
-# print()
-
-for lines in Second_Split:
-   print(lines)
-
-
-
 for lists in Second_Split:
-    dct = {}
-    for sublst in lists:
-        keys = sublst[0]
-        value = sublst[1::]
-    dct.update([(keys, value)])
-    mainlst.append(dct)
+    subdict = {}
+    final = {}
+    for element in lists:
+        keys = element[0]
+        value = element[1::]
+        subdict.update([(keys, value)])
+        final = {k: val[0] if len(val) == 1 else val for k, val in subdict.items()}
+    end.append(final)
 
-# final = {k: val[0] if len(val) == 1 else val for k, val in dct.items()}
+print(json.dumps(end, indent=4))
 
-# print()
-print(mainlst)
-# print(final)
-# print(json.dumps(final, indent=4))
+# date = time.strftime("%Y-%m-%d_%H-%M-%S")
+# df = pd.DataFrame(final, columns=end)
+# #df = df.append(final, ignore_index=True)
+
+# df.to_excel(r'C:\Users\davide.panzeri\Desktop\Router ' + date + '.xlsx',sheet_name='POLICY-MAP', index = True )
