@@ -7,7 +7,7 @@ import time
 
 os.chdir(r'C:\Users\davide.panzeri\Desktop\Configs\NCS')
 
-filename = [line.rstrip() for line in open('FERRARA-MPLS-1.txt')]
+filename = [line.rstrip() for line in open('EST-2.txt')]
 
 filteredlines = []
 action = []
@@ -84,8 +84,8 @@ for lists in Second_Split:
 
 print(json.dumps(end, indent=4))
 
-# date = time.strftime("%Y-%m-%d_%H-%M-%S")
-# df = pd.DataFrame(final, columns=end)
-# #df = df.append(final, ignore_index=True)
+date = time.strftime("%Y-%m-%d_%H-%M-%S")
+df = pd.DataFrame()
+df = df.append(end, ignore_index=True,)
 
-# df.to_excel(r'C:\Users\davide.panzeri\Desktop\Router ' + date + '.xlsx',sheet_name='POLICY-MAP', index = True )
+df.to_excel(r'C:\Users\davide.panzeri\Desktop\Router ' + date + '.xlsx',sheet_name='POLICY-MAP', index = True )
