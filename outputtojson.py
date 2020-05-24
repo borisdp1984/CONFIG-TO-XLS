@@ -1,7 +1,6 @@
 import re
 from itertools import count
 
-
 class OutputToJson:
     def __init__(self, config):
         self.config = config
@@ -11,6 +10,7 @@ class OutputToJson:
         splitted_lists = []
         hostname = []
         end = {}
+
         subnet_dict = {
             ' 0.0.0.0': '/0', ' 128.0.0.0': '/1 ', ' 192.0.0.0': '/2 ', ' 224.0.0.0': '/3 ', ' 240.0.0.0': '/4 ',
             ' 248.0.0.0': '/5 ', ' 252.0.0.0': '/6 ', ' 254.0.0.0': '/7 ', ' 255.0.0.0': '/8 ', ' 255.128.0.0': '/9 ',
@@ -22,8 +22,8 @@ class OutputToJson:
             ' 255.255.255.252': '/30', ' 255.255.255.254': '/31', ' 255.255.255.255': '/32'}
         # Find line with keyword "hostname" transform
         # in Dictionary and update the end  dictionary named "final"
-        received = self.config
-        conf = received.splitlines()
+        #received = self.config
+        conf = self.config
         for line in conf:
             if re.search("^hostname", line):
                 hostname.append(line)
@@ -31,15 +31,17 @@ class OutputToJson:
             spl = s.split()
             op = {spl[i]: spl[i + 1] for i in range(0, len(spl), 2)}
             end.update(op)
-        # Find line with keyword "interface" or "ip address X.X.X.X. Y.Y.Y.Y" or "ip address X.X.X.X. Y.Y.Y.Y secondary"
+        # Find line with keyword "interface" or "ip[v4] address X.X.X.X. Y.Y.Y.Y" or "ip[v4] address X.X.X.X. Y.Y.Y.Y secondary"
         # remove the words "ip address" from the string transform
         # the result in a list named filteredlines
         for line in conf:
             if re.search(r"^interface|"
                          r"ip address \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$|"
                          r"ip address \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} secondary$|"
+                         r"ipv4 address \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$|"
+                         r"ipv4 address \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} secondary$|"       
                          r" no ip address$", line):
-                b = re.sub("^ ip address |^ip address| point-to-point$| secondary$", "", line)
+                b = re.sub("^ +ip address |^ip address|^ipv4 address|^ +ipv4 address| point-to-point$| secondary$", "", line)
                 filteredlines.append(b)
         # change the subnet mask With prefix mask
         for i, word in enumerate(filteredlines):
@@ -62,7 +64,8 @@ class OutputToJson:
             value = lists[1::]
             cleankey = re.sub("^interface | point-to-point$", "", keys)
             end.update([(cleankey, value)])
-        final = {k: val[0] if len(val) == 1 else val for k, val in end.items()}
+        fin = {k: val[0] if len(val) == 1 else val for k, val in end.items()}
+        final = {k: v for k, v in fin.items() if v != []}
         return final
 
     def policymap_to_json(self):
@@ -137,3 +140,4 @@ class OutputToJson:
                 subdict.update([(keys, value)])
                 final = {k: val[0] if len(val) == 1 else val for k, val in subdict.items()}
             end.append(final)
+        return end
