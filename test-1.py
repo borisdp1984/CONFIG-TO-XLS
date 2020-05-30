@@ -5,9 +5,9 @@ from itertools import count
 import pandas as pd
 import time
 
-os.chdir(r'C:\Users\davide.panzeri\Desktop\Configs\NCS')
+os.chdir(r'C:\Users\davide.panzeri\Desktop\Configs\FERRARA')
 
-filename = [line.rstrip() for line in open('EST-2.txt')]
+filename = [line.rstrip() for line in open('FERRARA-MPLS-1.txt')]
 
 filteredlines = []
 action = []

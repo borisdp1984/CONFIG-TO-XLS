@@ -89,7 +89,7 @@ class OutputToJson:
                          r"|^ +[P-p]riority.\S+.\S+"
                          r"|^ +[P-p]olice.\S+.\S+.\S+"
                          r"|^ +[S-s]hape.\S+.\S+.\S+.\S+"
-                         r"|set.(ip.(?!next-hop|local-preference)|"
+                         r"|set.(ip.(?!next-hop|local-preference|interface)|"
                          r"atm-clp|cos|discard-class|dscp|fr-de|mpls|precedence|"
                          r"qos-group|srp-priority|traffic-class).\S+"
                          r"|^ +[B-b]andwidth.\S+.\S+.\S+"
@@ -149,3 +149,30 @@ class OutputToJson:
                 final = {k: val[0] if len(val) == 1 else val for k, val in subdict.items()}
             end.append(final)
         return end
+
+    def policymap_interfaces_to_json(self):
+        received = self.config
+        filteredlines = []
+        splitted_lists = []
+        end = {}
+        for line in received:
+            if re.search(r"^interface|"
+                         r"[S-s]ervice-policy.(input|output|in|out).\S+", line):
+                b = re.sub("^ +service-policy ", "",
+                           line)
+                filteredlines.append(b)
+        for s in filteredlines:
+            if s == '':
+                continue
+            if s.startswith('interface') or len(splitted_lists) == 0:
+                splitted_lists.append([s])
+                continue
+            splitted_lists[-1].append(s)
+        for lists in splitted_lists:
+            keys = lists[0]
+            value = lists[1::]
+            cleankey = re.sub("^interface ", "", keys)
+            end.update([(cleankey, value)])
+        fin = {k: val[0] if len(val) == 1 else val for k, val in end.items()}
+        final = {k: v for k, v in fin.items() if v != []}
+        return final
